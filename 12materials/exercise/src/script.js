@@ -2,6 +2,15 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
+import alphaTex from '../static/textures/door/alpha.jpg'
+import ambientOcclusionTex from '../static/textures/door/ambientOcclusion.jpg'
+import colorTex from '../static/textures/door/color.jpg'
+import heightTex from '../static/textures/door/height.jpg'
+import metalnessTex from '../static/textures/door/metalness.jpg'
+import normalTex from '../static/textures/door/normal.jpg'
+import roughnessTex from '../static/textures/door/roughness.jpg'
+import matCapTex from '../static/textures/matcaps/6.png'
+
 /**
  * Base
  */
@@ -18,6 +27,49 @@ const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
+
+// Textures
+const textureLoader = new THREE.TextureLoader()
+const alphaTexture = textureLoader.load(alphaTex)
+const heightTexture = textureLoader.load(heightTex)
+const ambientOcclusionTexture = textureLoader.load(ambientOcclusionTex)
+const normalTexture = textureLoader.load(normalTex)
+const metalnessTexture = textureLoader.load(metalnessTex)
+const roughnessTexture = textureLoader.load(roughnessTex)
+const colorTexture = textureLoader.load(colorTex)
+const matCapTexture = textureLoader.load(matCapTex)
+
+// objects
+// const material = new THREE.MeshBasicMaterial({ map: matCapTexture })
+const material = new THREE.MeshBasicMaterial()
+// OR w no argument
+material.map = colorTexture
+// OR FOR COLORS
+// material.color.set('lime')
+// OR
+// material.wireframe = true
+// material.color = new THREE.Color('#0f0')
+// material.opacity = 0.5
+material.transparent = true
+material.alphaMap = alphaTexture
+
+const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    material
+)
+sphere.position.x = -1.5
+const plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(1, 1),
+    material
+)
+
+const torus = new THREE.Mesh(
+    new THREE.TorusGeometry(0.3, 0.2, 16, 32),
+    material
+)
+torus.position.x = 1.5
+
+scene.add(sphere, plane, torus)
 
 window.addEventListener('resize', () =>
 {
@@ -64,7 +116,16 @@ const clock = new THREE.Clock()
 
 const tick = () =>
 {
+
     const elapsedTime = clock.getElapsedTime()
+    // update objects
+    sphere.rotation.y = 0.1 * elapsedTime
+    plane.rotation.y = 0.1 * elapsedTime
+    torus.rotation.y = 0.1 * elapsedTime
+
+    sphere.rotation.x = 0.15 * elapsedTime
+    plane.rotation.x = 0.15 * elapsedTime
+    torus.rotation.x = 0.15 * elapsedTime
 
     // Update controls
     controls.update()
