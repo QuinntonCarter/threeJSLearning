@@ -2,6 +2,8 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 
 /**
  * Base
@@ -15,20 +17,60 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+// Axes Helper
+const axesHelper = new THREE.AxesHelper()
+scene.add(axesHelper)
+
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
 
+// Fonts
+const fontLoader = new FontLoader()
+fontLoader.load(
+    '/fonts/helvetiker_regular.typeface.json',
+    (font) => {
+        const textGeometry = new TextGeometry(
+            'Hello Three.js',
+            {
+                font: font,
+                // OR
+                // font
+                size: 0.5,
+                height: 0.2,
+                curveSegments: 5,
+                bevelEnabled: true,
+                bevelThickness: 0.03,
+                bevelSize: 0.02,
+                bevelOffset: 0,
+                bevelSegments: 4
+            }
+        )
+        // example to understand bevel
+        // textGeometry.computeBoundingBox()
+        // textGeometry.translate(
+        //     // moves back half bounding on xyz, subtracts bevel from associated
+        //     // axes to perfectly center
+        //     - (textGeometry.boundingBox.max.x - 2) * 0.5,
+        //     - (textGeometry.boundingBox.max.y - 2) * 0.5,
+        //     - (textGeometry.boundingBox.max.z - 3) * 0.5
+        // )
+        textGeometry.center()
+
+
+
+        const textMaterial = new THREE.MeshBasicMaterial({ wireframe: true})
+        const text = new THREE.Mesh(textGeometry, textMaterial)
+        scene.add(text)
+    }
+
+)
+
 /**
  * Object
  */
-const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshBasicMaterial()
-)
 
-scene.add(cube)
 
 /**
  * Sizes
