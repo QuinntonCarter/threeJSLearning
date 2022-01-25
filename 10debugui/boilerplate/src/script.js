@@ -1,8 +1,7 @@
-import './style.css';
-import * as THREE from 'three';
-import GUI from 'lil-gui';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import gsap from 'gsap';
+import './style.css'
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import gsap from 'gsap'
 
 /**
  * Base
@@ -20,36 +19,6 @@ const geometry = new THREE.BoxGeometry(1, 1, 1)
 const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
 const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
-
-// Debug ***
-const parameters = {
-    color: 0xff0000,
-    spin: () => {
-        gsap.to(mesh.rotation, { duration: .5, y: mesh.rotation.y + 10 })
-    },
-    hide: () => {
-        gui.hide()
-    }
-}
-
-const gui = new GUI()
-// gui.add(mesh.position, 'y', -3, 3, 0.01)
-// gui.add(mesh.position, 'x', -3, 3, 0.01)
-// gui.add(mesh.position, 'z', -3, 3, 0.01)
-// ^same as the following(chaining method)
-gui.add(mesh.position, 'y').min(-3).max(3).step(0.01).name('elevation')
-gui.add(mesh.position, 'x').min(-3).max(3).step(0.01)
-gui.add(mesh.position, 'z').min(-3).max(3).step(0.01)
-// debug tweaks
-gui.add(mesh, 'visible')
-gui.add(material, 'wireframe')
-gui.addColor(parameters, 'color').onChange(() => {
-    material.color.set(parameters.color)
-})
-gui.add(parameters, 'spin')
-gui.add(gui, 'visible')
-gui.add(parameters, 'hide')
-gui.title('lil-gui Debug Controls')
 
 /**
  * Sizes
@@ -104,10 +73,10 @@ const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
 
-    // Update camera controls
+    // Update controls
     controls.update()
 
-    // update Render scene
+    // Render
     renderer.render(scene, camera)
 
     // Call tick again on the next frame
