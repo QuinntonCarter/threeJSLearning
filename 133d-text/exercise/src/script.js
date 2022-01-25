@@ -1,9 +1,9 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import * as dat from 'lil-gui'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import * as dat from 'lil-gui'
 
 /**
  * Base
@@ -60,7 +60,8 @@ fontLoader.load(
         textGeometry.center()
 
         const material = new THREE.MeshMatcapMaterial({ matcap: matcapTexture})
-        // textMaterial.matcap = matcapTexture
+        // OR assign property like
+        // material.matcap = matcapTexture
         const text = new THREE.Mesh(textGeometry, material)
         scene.add(text)
 
@@ -152,6 +153,7 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
 
     // Update controls
     controls.update()
