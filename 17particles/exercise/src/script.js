@@ -26,21 +26,21 @@ const particleTexture = textureLoader.load('/textures/particles/2.png')
  */
 // Geometry
 const particlesGeometry = new THREE.BufferGeometry(1, 32, 32);
-const count = 50000
+const particleCount = 50000
 
 // * 3 to represent xyz values
-const positions = new Float32Array(count * 3)
+const particlePositions = new Float32Array(particleCount * 3)
 // * 3 to represent rgb values
-const colors = new Float32Array(count * 3)
-for(let i= 0; i < count * 3; i++){
-    positions[i] = (Math.random() - 0.5) * 10; 
+const colors = new Float32Array(particleCount * 3)
+for(let i = 0; i < particleCount * 3; i++){
+    particlePositions[i] = (Math.random() - 0.5) * 10;
     colors[i] = Math.random()
 }
 
 particlesGeometry.setAttribute(
     'position',
     // 3 to represent xyz values
-    new THREE.BufferAttribute(positions, 3)
+    new THREE.BufferAttribute(particlePositions, 3)
     )
 
 particlesGeometry.setAttribute(
@@ -136,12 +136,12 @@ const tick = () =>
 
     // Update particles
     // particles.rotation.y = elapsedTime
-    // for moving particles; array representing x y z positions
-    for(let i = 0; i < count; i++){
-        // gets value individually * 3
+    // for moving particles; array representing x y z particlePositions
+    for(let i = 0; i < particleCount; i++){
+        // multiplies number at i by 3 to generate new position; ie move by (3 x last position)
         const i3 = i * 3
         const x = particlesGeometry.attributes.position.array[i3]
-
+        
         particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(elapsedTime + x)
     }
     particlesGeometry.attributes.position.needsUpdate = true

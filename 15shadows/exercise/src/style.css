@@ -10,7 +10,7 @@ body
     overflow: hidden;
 }
 
-.webgl
+#root
 {
     position: fixed;
     top: 0;

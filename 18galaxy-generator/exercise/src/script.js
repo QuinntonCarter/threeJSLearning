@@ -52,7 +52,6 @@ const generateGalaxy = () => {
     const colorInside = new THREE.Color(parameters.insideColor)
     const colorOutside = new THREE.Color(parameters.outsideColor)
 
-
     for(let i = 0; i < parameters.count; i++){
         const i3 = i * 3
         // Position
