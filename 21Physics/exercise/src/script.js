@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "lil-gui";
-import CANNON from "cannon";
+import * as CANNON from "cannon-es";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 THREE.ColorManagement.enabled = false;
 
 /**
@@ -25,8 +25,21 @@ debugObject.createBox = () => {
   });
 };
 
+debugObject.reset = () => {
+  for (const object of objectsToUpdate) {
+    // remove body
+    object.body.removeEventListener("collide", playCollisionSound);
+    world.removeBody(object.body);
+    // remove mesh
+    scene.remove(object.mesh);
+  }
+  // empty objects to update array
+  objectsToUpdate.splice(0, objectsToUpdate.length);
+};
+
 gui.add(debugObject, "createSphere");
 gui.add(debugObject, "createBox");
+gui.add(debugObject, "reset");
 
 /**
  * Base
@@ -36,6 +49,25 @@ const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
+
+// Sounds
+const hitSound = new Audio("/sounds/hit.mp3");
+const myLegSound = new Audio("/sounds/my-leg_2.mp3");
+const squeakySound = new Audio("/sounds/squeaky-toy.mp3");
+const playCollisionSound = (collision) => {
+  // viewable collision information
+  const impactStrength = collision.contact.getImpactVelocityAlongNormal();
+  // hitSound.play();
+  // myLegSound.currentTime = 0;
+  // myLegSound.play();
+  if (impactStrength > 1.5) {
+    // randomize sound volume
+    squeakySound.volume = Math.random();
+    // resets sound per collision
+    squeakySound.currentTime = 0;
+    squeakySound.play();
+  }
+};
 
 /**
  * Textures
@@ -54,6 +86,10 @@ const environmentMapTexture = cubeTextureLoader.load([
 
 // Physics
 const world = new CANNON.World();
+// broadphase: pre-sorts objects based on collision detection
+world.broadphase = new CANNON.SAPBroadphase(world);
+// performance: sleep disallows for further collision testing when obj not moving or otherwise being interacted with (can customize when sleep occurs)
+world.allowSleep = true;
 world.gravity.set(0, -9.82, 0);
 
 // Materials
@@ -238,6 +274,7 @@ const createSphere = (radius, position) => {
     material: defaultMaterial,
   });
   body.position.copy(position);
+  body.addEventListener("collide", playCollisionSound);
   world.addBody(body);
 
   // save in objects to update
@@ -274,6 +311,7 @@ const createBox = (width, height, depth, position) => {
     material: defaultMaterial,
   });
   body.position.copy(position);
+  body.addEventListener("collide", playCollisionSound);
   world.addBody(body);
 
   // save in objects to update
