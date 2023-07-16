@@ -67,6 +67,7 @@ gltfLoader.setDRACOLoader(dracoLoader);
 //   }
 // );
 // FAWX
+let mixer = null;
 gltfLoader.load(
   // file path
   "/models/Fox/glTF/Fox.gltf",
@@ -74,16 +75,11 @@ gltfLoader.load(
   (gltf) => {
     // for rendering one item/child
     // scene.add(gltf.scene.children[0]);
-    // for rendering multi piece object
-    // while (gltf.scene.children.length) {
-    //   scene.add(gltf.scene.children[0]);
-    // }
-    // OR
-    // const children = [...gltf.scene.children];
-    // for (const child of children) {
-    //   scene.add(child);
-    // }
-    console.log(gltf);
+    mixer = new THREE.AnimationMixer(gltf.scene);
+    const action = mixer.clipAction(gltf.animations[1]);
+    // add frame updates to tick before play() will work
+    action.play();
+
     // OR just add group to scene
     gltf.scene.scale.set(0.025, 0.025, 0.025);
     scene.add(gltf.scene);
@@ -184,7 +180,11 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime();
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
-
+  // allows animation update for obj(s)
+  if (mixer !== null) {
+    // mixer update for obj animation
+    mixer.update(deltaTime);
+  }
   // Update controls
   controls.update();
 
