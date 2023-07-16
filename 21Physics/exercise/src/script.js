@@ -62,10 +62,10 @@ const playCollisionSound = (collision) => {
   // myLegSound.play();
   if (impactStrength > 1.5) {
     // randomize sound volume
-    squeakySound.volume = Math.random();
+    myLegSound.volume = Math.random();
     // resets sound per collision
-    squeakySound.currentTime = 0;
-    squeakySound.play();
+    myLegSound.currentTime = 0;
+    myLegSound.play();
   }
 };
 
