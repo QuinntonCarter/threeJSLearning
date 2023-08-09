@@ -3,12 +3,15 @@ import * as dat from "lil-gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 
 // Loaders
 // loads gltf **
 const gltfLoader = new GLTFLoader();
 const rgbeLoader = new RGBELoader();
+const exrLoader = new EXRLoader();
 const cubeTextureLoader = new THREE.CubeTextureLoader();
+const textureLoader = new THREE.TextureLoader();
 
 /**
  * Base
@@ -67,15 +70,22 @@ gui
 
 // RGBE (red, green, blue exponent); in the encoding for the HDR format
 // HDR (RGBE) equirectangular
-rgbeLoader.load("/environmentMaps/blender-2kJourney2.hdr", (environmentMap) => {
+// rgbeLoader.load("/environmentMaps/blender-2kJourney2.hdr", (environmentMap) => {
+//   environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+//   scene.background = environmentMap;
+//   scene.environment = environmentMap;
+// });
+
+// **
+// HDR EXR equirectangular ** can download more AI generated exr/hdr files @ https://skybox.blockadelabs.com/
+exrLoader.load("/environmentMaps/nvidiaCanvas-4k.exr", (environmentMap) => {
   environmentMap.mapping = THREE.EquirectangularReflectionMapping;
   scene.background = environmentMap;
-  scene.environment = environmentMap;
 });
 
-// // add env map to scene **
-// scene.environment = environmentMap;
-// scene.background = environmentMap;
+// LDR EXR
+// **
+
 /**
  * Torus Knot
  */
