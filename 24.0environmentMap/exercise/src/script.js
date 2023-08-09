@@ -20,7 +20,6 @@ const textureLoader = new THREE.TextureLoader();
 // Debug
 const gui = new dat.GUI();
 const global = {};
-
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
 
@@ -86,29 +85,62 @@ gui
 // });
 
 // LDR EXR **
-const environmentMap = textureLoader.load("/environmentMaps/ldrEXR.jpg");
+// const environmentMap = textureLoader.load("/environmentMaps/ldrEXR.jpg");
+// environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+// // LDR EXR will need the colorSpace param to be set to SRGBColorSpace (normalizes image) **
+// environmentMap.colorSpace = THREE.SRGBColorSpace;
+// scene.background = environmentMap;
+// scene.environment = environmentMap;
+
+// ** Ground projected skybox
+// rgbeLoader.load("/environmentMaps/2/2k.hdr", (environmentMap) => {
+//   environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+//   scene.environment = environmentMap;
+
+//   // Skybox: allows mesh to rest on "skybox" surface **
+//   const skybox = new GroundProjectedSkybox(environmentMap);
+//   skybox.radius = 120;
+//   skybox.height = 11;
+//   // setScalar changes size of skybox **
+//   skybox.scale.setScalar(50);
+//   scene.add(skybox);
+
+//   gui.add(skybox, "radius", 1, 200, 0.1).name("SkyboxRadius");
+//   gui.add(skybox, "height", 1, 200, 0.1).name("SkyboxHeight");
+// });
+
+// Real Time environment map **
+const environmentMap = textureLoader.load(
+  "/environmentMaps/blockadesLabsSkybox/interior_views_cozy_wood_cabin_with_cauldron_and_p.jpg"
+);
 environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 // LDR EXR will need the colorSpace param to be set to SRGBColorSpace (normalizes image) **
 environmentMap.colorSpace = THREE.SRGBColorSpace;
 scene.background = environmentMap;
 scene.environment = environmentMap;
 
-// ** Ground projected skybox
-rgbeLoader.load("/environmentMaps/2/2k.hdr", (environmentMap) => {
-  environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-  scene.environment = environmentMap;
+// Holy Donut (ring light) **
+const holyDonut = new THREE.Mesh(
+  new THREE.TorusGeometry(8, 0.5),
+  new THREE.MeshBasicMaterial({ color: new THREE.Color(10, 4, 2) })
+);
+holyDonut.layers.enable(1);
+holyDonut.position.y = 3.5;
+scene.add(holyDonut);
 
-  // Skybox: allows mesh to rest on "skybox" surface **
-  const skybox = new GroundProjectedSkybox(environmentMap);
-  skybox.radius = 120;
-  skybox.height = 11;
-  // setScalar changes size of skybox **
-  skybox.scale.setScalar(50);
-  scene.add(skybox);
+// Cube render texture arget **
+const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(
+  // watch this number affecting performance, reduce if possible **
+  256,
+  // can use FLOAT or HalfFloat (half float is 16bits whereas float is 32) **
+  { type: THREE.HalfFloatType }
+);
+scene.environment = cubeRenderTarget.texture;
 
-  gui.add(skybox, "radius", 1, 200, 0.1).name("SkyboxRadius");
-  gui.add(skybox, "height", 1, 200, 0.1).name("SkyboxHeight");
-});
+//  cube camera **
+const cubeCamera = new THREE.CubeCamera(0.1, 100, cubeRenderTarget);
+// to set rendered objects present in HDR, use layers (like setting z-index of objects in scene but only within the HDR) **
+cubeCamera.layers.set(1);
 
 /**
  * Torus Knot
@@ -191,6 +223,11 @@ const clock = new THREE.Clock();
 const tick = () => {
   // Time
   const elapsedTime = clock.getElapsedTime();
+
+  if (holyDonut) {
+    holyDonut.rotation.x = Math.sin(elapsedTime) * 2;
+    cubeCamera.update(renderer, scene);
+  }
 
   // Update controls
   controls.update();
