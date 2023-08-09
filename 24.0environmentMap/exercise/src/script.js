@@ -4,6 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
+import { GroundProjectedSkybox } from "three/examples/jsm/objects/GroundProjectedSkybox.js";
 
 // Loaders
 // loads gltf **
@@ -38,8 +39,8 @@ const updateAllMaterials = () => {
 
 // Environment Map
 // add blurry to background **
-scene.backgroundBlurriness = 0.08;
-scene.backgroundIntensity = 7;
+scene.backgroundBlurriness = 0;
+scene.backgroundIntensity = 1.3;
 
 gui.add(scene, "backgroundBlurriness").min(0).max(1).step(0.001);
 gui.add(scene, "backgroundIntensity").min(0).max(10).step(0.001);
@@ -78,13 +79,36 @@ gui
 
 // **
 // HDR EXR equirectangular ** can download more AI generated exr/hdr files @ https://skybox.blockadelabs.com/
-exrLoader.load("/environmentMaps/nvidiaCanvas-4k.exr", (environmentMap) => {
-  environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-  scene.background = environmentMap;
-});
+// exrLoader.load("/environmentMaps/nvidiaCanvas-4k.exr", (environmentMap) => {
+//   environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+//   scene.background = environmentMap;
+//   scene.environment = environmentMap;
+// });
 
-// LDR EXR
-// **
+// LDR EXR **
+const environmentMap = textureLoader.load("/environmentMaps/ldrEXR.jpg");
+environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+// LDR EXR will need the colorSpace param to be set to SRGBColorSpace (normalizes image) **
+environmentMap.colorSpace = THREE.SRGBColorSpace;
+scene.background = environmentMap;
+scene.environment = environmentMap;
+
+// ** Ground projected skybox
+rgbeLoader.load("/environmentMaps/2/2k.hdr", (environmentMap) => {
+  environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+  scene.environment = environmentMap;
+
+  // Skybox: allows mesh to rest on "skybox" surface **
+  const skybox = new GroundProjectedSkybox(environmentMap);
+  skybox.radius = 120;
+  skybox.height = 11;
+  // setScalar changes size of skybox **
+  skybox.scale.setScalar(50);
+  scene.add(skybox);
+
+  gui.add(skybox, "radius", 1, 200, 0.1).name("SkyboxRadius");
+  gui.add(skybox, "height", 1, 200, 0.1).name("SkyboxHeight");
+});
 
 /**
  * Torus Knot
