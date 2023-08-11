@@ -293,7 +293,8 @@ const shaderMaterial = new THREE.ShaderMaterial({
   precision: "lowp",
   uniforms: {
     uDisplacementTexture: { value: displacementTexture },
-    uDisplacementStrength: { value: 1.5 },
+    // handled by DISPLACEMENT_STRENGTH for performance optimization *
+    // uDisplacementStrength: { value: 1.5 },
   },
   defines: {
     // define this way this way 1/2
