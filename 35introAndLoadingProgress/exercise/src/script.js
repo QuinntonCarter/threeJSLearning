@@ -1,14 +1,39 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { gsap } from "gsap";
 
-//  ** = from exercise in video
+//  ** = code from exercise in video
 
 /**
  * Loaders
  */
-const gltfLoader = new GLTFLoader();
-const cubeTextureLoader = new THREE.CubeTextureLoader();
+// loading bar element
+const loadingBarElement = document.querySelector(".loading-bar");
+// loading manager **
+const loadingManager = new THREE.LoadingManager(
+  // loading **
+  () => {
+    // can use this GSAP method
+    // gsap.delayedCall(0.5, () =>
+    // )
+    //  OR this window method
+    window.setTimeout(() => {
+      // this mounts after overlay is created
+      // transitino (tween) duration is 3 seconds, value from 1 to 0 **
+      gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0 });
+      loadingBarElement.classList.add("ended");
+      loadingBarElement.style.transform = ``;
+    }, 500);
+  },
+  // progress **
+  (itemUrl, itemsLoaded, itemsTotal) => {
+    const progressRatio = itemsLoaded / itemsTotal;
+    loadingBarElement.style.transform = `scaleX(${progressRatio})`;
+  }
+);
+const gltfLoader = new GLTFLoader(loadingManager);
+const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager);
 
 /**
  * Base
@@ -25,16 +50,22 @@ const scene = new THREE.Scene();
 // Overlay **
 const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
 // const overlayMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+// OR
 const overlayMaterial = new THREE.ShaderMaterial({
-  wireframe: true,
+  // wireframe: true,
+  transparent: true,
+  uniforms: {
+    uAlpha: { value: 1 },
+  },
   vertexShader: `
     void main()
     {
         gl_Position = vec4(position, 1.0);
     }`,
   fragmentShader: `
+  uniform float uAlpha;
     void main(){
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
     }`,
 });
 const overlay = new THREE.Mesh(overlayGeometry, overlayMaterial);
