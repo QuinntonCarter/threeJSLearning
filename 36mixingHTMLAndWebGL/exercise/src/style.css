@@ -70,6 +70,12 @@ body {
   font-size: 14px;
   /* changes cursor to question mark on lebel hover */
   cursor: help;
+  /* hides label: sometimes label won't hide and need to put scale(0.001, 0.001) */
+  transform: scale(0, 0);
+  transition: transform 0.3;
+}
+.point.visible .label {
+  transform: scale(1, 1);
 }
 
 .point .text {
