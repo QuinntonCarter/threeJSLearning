@@ -3,31 +3,36 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { gsap } from "gsap";
 
-//  ** = code from exercise in video
-
 /**
  * Loaders
  */
-// loading bar element
+let sceneReady = false;
 const loadingBarElement = document.querySelector(".loading-bar");
-// loading manager **
 const loadingManager = new THREE.LoadingManager(
-  // loading **
+  // Loaded
   () => {
-    // can use this GSAP method
-    // gsap.delayedCall(0.5, () =>
-    // )
-    //  OR this window method
+    // Wait a little
     window.setTimeout(() => {
-      // this mounts after overlay is created
-      // transitino (tween) duration is 3 seconds, value from 1 to 0 **
-      gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0 });
+      // Animate overlay
+      gsap.to(overlayMaterial.uniforms.uAlpha, {
+        duration: 3,
+        value: 0,
+        delay: 1,
+      });
+
+      // Update loadingBarElement
       loadingBarElement.classList.add("ended");
-      loadingBarElement.style.transform = ``;
+      loadingBarElement.style.transform = "";
     }, 500);
+    // set scene ready after timeout **
+    window.setTimeout(() => {
+      sceneReady = true;
+    }, 2000);
   },
-  // progress **
+
+  // Progress
   (itemUrl, itemsLoaded, itemsTotal) => {
+    // Calculate the progress and update the loadingBarElement
     const progressRatio = itemsLoaded / itemsTotal;
     loadingBarElement.style.transform = `scaleX(${progressRatio})`;
   }
@@ -47,10 +52,10 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
-// Overlay **
+/**
+ * Overlay
+ */
 const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
-// const overlayMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-// OR
 const overlayMaterial = new THREE.ShaderMaterial({
   // wireframe: true,
   transparent: true,
@@ -58,19 +63,22 @@ const overlayMaterial = new THREE.ShaderMaterial({
     uAlpha: { value: 1 },
   },
   vertexShader: `
-    void main()
-    {
-        gl_Position = vec4(position, 1.0);
-    }`,
+        void main()
+        {
+            gl_Position = vec4(position, 1.0);
+        }
+    `,
   fragmentShader: `
-  uniform float uAlpha;
-    void main(){
-        gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
-    }`,
+        uniform float uAlpha;
+
+        void main()
+        {
+            gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
+        }
+    `,
 });
 const overlay = new THREE.Mesh(overlayGeometry, overlayMaterial);
 scene.add(overlay);
-// **
 
 /**
  * Update all materials
@@ -112,14 +120,34 @@ debugObject.envMapIntensity = 2.5;
 /**
  * Models
  */
-gltfLoader.load("/models/FlightHelmet/glTF/FlightHelmet.gltf", (gltf) => {
-  gltf.scene.scale.set(10, 10, 10);
-  gltf.scene.position.set(0, -4, 0);
+gltfLoader.load("/models/DamagedHelmet/glTF/DamagedHelmet.gltf", (gltf) => {
+  gltf.scene.scale.set(2.5, 2.5, 2.5);
   gltf.scene.rotation.y = Math.PI * 0.5;
   scene.add(gltf.scene);
 
   updateAllMaterials();
 });
+
+//
+// Points of interest **
+//
+// raycaster**
+const raycaster = new THREE.Raycaster();
+
+const points = [
+  {
+    position: new THREE.Vector3(1.55, 0.3, -0.6),
+    element: document.querySelector(".point-0"),
+  },
+  {
+    position: new THREE.Vector3(0.5, 0.8, -1.6),
+    element: document.querySelector(".point-1"),
+  },
+  {
+    position: new THREE.Vector3(1.6, -1.3, -0.7),
+    element: document.querySelector(".point-2"),
+  },
+];
 
 /**
  * Lights
@@ -192,7 +220,35 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const tick = () => {
   // Update controls
   controls.update();
+  if (sceneReady) {
+    // go through each point **
+    for (const point of points) {
+      const screenPosition = point.position.clone();
+      screenPosition.project(camera);
 
+      raycaster.setFromCamera(screenPosition, camera);
+      const intersects = raycaster.intersectObjects(scene.children, true);
+      if (intersects.length === 0) {
+        point.element.classList.add("visible");
+      } else {
+        const intersectionDistance = intersects[0].distance;
+        const pointDistance = point.position.distanceTo(camera.position);
+
+        if (intersectionDistance < pointDistance) {
+          point.element.classList.remove("visible");
+        } else {
+          point.element.classList.add("visible");
+        }
+      }
+
+      // creates variable that finds the screen position at the x axis for each element in the points array
+      // and multiplies it by the screen innerWidth and innerHeight (*0.5 or 2)
+      const translateX = screenPosition.x * sizes.width * 0.5;
+      const translateY = screenPosition.y * sizes.height * -0.5;
+      // move label according to calculation in translateX variable
+      point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+    }
+  }
   // Render
   renderer.render(scene, camera);
 
