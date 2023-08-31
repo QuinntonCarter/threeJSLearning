@@ -6,7 +6,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 import { Spector } from "spectorjs";
 const spector = new Spector();
-spector.displayUI();
+// spector.displayUI();
 
 /**
  * Base
@@ -79,6 +79,8 @@ gltfLoader.load("threeJSJourney37Final1.5.glb", (gltf) => {
 
   scene.add(gltf.scene);
 });
+// scene.background = new THREE.Color("lightblue");
+scene.background = new THREE.TextureLoader().load("Mystic_mountaindddd.jpg");
 
 /**
  * Object
@@ -121,10 +123,14 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.x = 4;
-camera.position.y = 2;
-camera.position.z = 4;
+camera.position.x = 1;
+camera.position.y = 1;
+camera.position.z = 2;
 scene.add(camera);
+// gui.add(camera.position, "x").min(4).max(6);
+// gui.add(camera.position, "y").min(2).max(6);
+// gui.add(camera.position, "z").min(2).max(6);
+console.log("camera position", camera.position);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
