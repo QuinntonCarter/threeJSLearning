@@ -19,5 +19,5 @@ body,
   overflow: hidden;
   border-radius: 30px;
   pointer-events: none;
-  user-select: none;
+  /* user-select: none; */
 }
