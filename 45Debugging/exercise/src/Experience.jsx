@@ -20,19 +20,19 @@ export default function Experience() {
     // supports, rgb, text name, hsl, hsla, and {r: '' g: '', b: ''} (r:g:b:) not well supported by ThreeJS
     color: "rgb(255, 0, 0)",
     visible: true,
-    myInterval: {
+    myIntervalExample: {
       min: 0,
       max: 10,
       value: [4, 5],
     },
-    clickMe: button(() => {
+    clickMeToConsoleLog: button(() => {
       console.log("BARBIE");
     }),
     choice: { options: ["a", "b", "c"] },
   });
 
   const { scale } = useControls("Cube", {
-    scale: {
+    scaleSliderExample: {
       value: 1.5,
       step: 0.01,
       min: 0,
