@@ -1,8 +1,9 @@
-import { OrbitControls } from "@react-three/drei";
+import { Float, OrbitControls } from "@react-three/drei";
 import { Perf } from "r3f-perf";
 import { Suspense } from "react";
 import Placeholder from "./Placeholder.jsx";
-import Model from "./Model";
+import Hamburger from "./Hamburger.jsx";
+import Fox from "./Fox.jsx";
 
 export default function Experience() {
   return (
@@ -11,7 +12,13 @@ export default function Experience() {
 
       <OrbitControls makeDefault />
 
-      <directionalLight castShadow position={[1, 2, 3]} intensity={1.5} />
+      <directionalLight
+        castShadow
+        // sets the bias for shadow interpretation on meshes in scene
+        shadow-normalBias={0.04}
+        position={[1, 2, 3]}
+        intensity={1.5}
+      />
       <ambientLight intensity={0.5} />
 
       {/* <mesh castShadow position-x={-2}>
@@ -33,9 +40,13 @@ export default function Experience() {
         <planeGeometry />
         <meshStandardMaterial color="greenyellow" />
       </mesh>
-      <Suspense fallback={<Placeholder position-y={0.5} scale={[2, 3, 2]} />}>
-        <Model position-x={2} rotation-y={Math.PI * 0.2} />
+      <Suspense fallback={<Placeholder position-y={-1} scale={[2, 3, 2]} />}>
+        <Float speed={5}>
+          <Hamburger scale={0.35} />
+        </Float>
       </Suspense>
+
+      <Fox />
     </>
   );
 }
