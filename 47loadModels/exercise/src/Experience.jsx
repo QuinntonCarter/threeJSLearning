@@ -1,6 +1,6 @@
+import { Suspense } from "react";
 import { Float, OrbitControls } from "@react-three/drei";
 import { Perf } from "r3f-perf";
-import { Suspense } from "react";
 import Placeholder from "./Placeholder.jsx";
 import Hamburger from "./Hamburger.jsx";
 import Fox from "./Fox.jsx";
