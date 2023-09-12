@@ -5,7 +5,7 @@ import { EffectComposer } from "@react-three/postprocessing";
 export default function Experience() {
   return (
     <>
-      <EffectComposer multisampling={0}></EffectComposer>
+      <EffectComposer disableNormalPass multisampling={0}></EffectComposer>
       <Perf position="top-left" />
 
       <OrbitControls makeDefault />
