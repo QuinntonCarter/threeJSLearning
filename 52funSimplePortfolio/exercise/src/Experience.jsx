@@ -13,6 +13,7 @@ export default function Experience() {
   const { scene } = useGLTF(
     "https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/macbook/model.gltf"
   );
+  console.log("text helper", <Text>test</Text>);
   return (
     <>
       <Environment preset="city" />
@@ -51,11 +52,34 @@ export default function Experience() {
               rotation-x={-0.256}
             >
               <iframe title="iframe test" src="https://bruno-simon.com/html" />
-
-            <Text font="./52funSimplePortfolio/exercise/public/MedicineDrops-1GKwZ.otf">
-            </Text>
+            </Html>
           </primitive>
-          <Text> BARBIE </Text>
+          <Text
+            font="./MedicineDrops-1GKwZ.otf"
+            fontSize={1}
+            position={[2, 0.75, 0.75]}
+            rotation-y={-1.25}
+            maxWidth={2}
+            textAlign="center"
+          >
+            {/* <Text
+            font="./Datang-x3ZDV.otf"
+            fontSize={1}
+            position={[2, 0.75, 0.75]}
+            rotation-y={-1.25}
+            maxWidth={2}
+            textAlign="center"
+          > */}
+            {/* <Text
+            font="./Philophobia-0p8d.ttf"
+            fontSize={1}
+            position={[2, 0.75, 0.75]}
+            rotation-y={-1.25}
+            maxWidth={2}
+            textAlign="center"
+          > */}
+            BARBIE
+          </Text>
         </Float>
       </PresentationControls>
       <ContactShadows position-y={-1.4} opacity={0.4} scale={5} blur={2.4} />
