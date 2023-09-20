@@ -3,11 +3,16 @@ import { useFrame } from "@react-three/fiber";
 import { useKeyboardControls } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import useGame from "./stores/useGame";
 
 export default function Marble() {
   const bodyRef = useRef(null);
   const [subscribeKeys, getKeys] = useKeyboardControls();
   const { rapier, world } = useRapier();
+  const start = useGame((state) => state.start);
+  const end = useGame((state) => state.end);
+  const restart = useGame((state) => state.restart);
+  const blocksCount = useGame((state) => state.blocksCount);
 
   const [smoothedCameraPosition] = useState(
     // arguments set initial camera position
@@ -27,7 +32,24 @@ export default function Marble() {
     }
   };
 
+  const reset = () => {
+    // sets position (translation) to first block
+    bodyRef.current.setTranslation({ x: 0, y: 1, z: 0 });
+    // sets linear velocity to 0 (stops rotation/movment of marble)
+    bodyRef.current.setLinvel({ x: 0, y: 0, z: 0 });
+    // sets angular velocity to 0 (stops rotation/movment of marble)
+    bodyRef.current.setAngvel({ x: 0, y: 0, z: 0 });
+  };
+
   useEffect(() => {
+    const unsubscribeReset = useGame.subscribe(
+      ({ phase }) => phase,
+      (phase) => {
+        if (phase === "ready") {
+          reset();
+        }
+      }
+    );
     const unsubscribeJump = subscribeKeys(
       (state) => {
         return state.jump;
@@ -38,9 +60,14 @@ export default function Marble() {
         }
       }
     );
+    const unsubscribeAny = subscribeKeys(() => {
+      start();
+    });
     // runs this function when component is destroyed
     return () => {
       unsubscribeJump();
+      unsubscribeAny();
+      unsubscribeReset();
     };
   }, []);
 
@@ -94,6 +121,15 @@ export default function Marble() {
 
     state.camera.position.copy(cameraPosition);
     state.camera.lookAt(cameraTarget);
+
+    // phases
+    if (bodyPosition.z < -(blocksCount * 4 + 2)) {
+      return end();
+    }
+    // if minus the length of the level
+    if (bodyPosition.y < -4) {
+      restart();
+    }
   }, []);
 
   return (

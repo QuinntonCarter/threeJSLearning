@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { CuboidCollider, RigidBody } from "@react-three/rapier";
 import { useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { Float, Text, useGLTF } from "@react-three/drei";
 
 THREE.ColorManagement.legacyMode = false;
 
@@ -16,6 +16,20 @@ const wallMaterial = new THREE.MeshStandardMaterial({ color: "slategray" });
 export function BlockStart({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
+      <Float floatIntensity={0.25} rotationIntensity={0.25}>
+        <Text
+          font="./bebas-neue-v9-latin-regular.woff"
+          scale={0.5}
+          maxWidth={0.25}
+          lineHeight={0.75}
+          textAlign="right"
+          position={[0.75, 0.65, 0]}
+          rotation-y={-0.25}
+        >
+          Marble Race
+          <meshBasicMaterial toneMapped={false} />
+        </Text>
+      </Float>
       <RigidBody type="kinematicPosition">
         <mesh
           geometry={boxGeometryTHREE}
@@ -40,6 +54,17 @@ export function BlockEnd({ position = [0, 0, 0] }) {
 
   return (
     <group position={position}>
+      <Text
+        font="./bebas-neue-v9-latin-regular.woff"
+        scale={0.5}
+        maxWidth={0.25}
+        lineHeight={0.75}
+        position={[0, 0.65, 0]}
+        rotation-y={-0.25}
+      >
+        Finished
+        <meshBasicMaterial toneMapped={false} />
+      </Text>
       <RigidBody
         colliders="trimesh"
         type="dynamic"
@@ -268,6 +293,7 @@ function Bounds({ length = 1 }) {
 export default function Level({
   count = 5,
   types = [BlockSpinner, BlockAxe, BlockLimbo],
+  seed = 0,
 }) {
   const blocks = useMemo(() => {
     const randomBlocks = [];
@@ -278,7 +304,7 @@ export default function Level({
       console.log(randomBlocks);
     }
     return randomBlocks;
-  }, [count, types]);
+  }, [count, types, seed]);
   return (
     <>
       <BlockStart position={[0, 0, 0]} />
