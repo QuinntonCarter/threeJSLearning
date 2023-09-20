@@ -16,13 +16,15 @@ const wallMaterial = new THREE.MeshStandardMaterial({ color: "slategray" });
 export function BlockStart({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
-      <mesh
-        geometry={boxGeometryTHREE}
-        position={[0, -0.1, 0]}
-        scale={[4, 0.2, 4]}
-        material={floor1Material}
-        receiveShadow
-      />
+      <RigidBody type="kinematicPosition">
+        <mesh
+          geometry={boxGeometryTHREE}
+          position={[0, -0.1, 0]}
+          scale={[4, 0.2, 4]}
+          material={floor1Material}
+          receiveShadow
+        />
+      </RigidBody>
     </group>
   );
 }
@@ -47,7 +49,7 @@ export function BlockEnd({ position = [0, 0, 0] }) {
       >
         <primitive object={scene} scale={0.09} />
       </RigidBody>
-      <RigidBody type="fixed">
+      <RigidBody type="kinematicPosition">
         <mesh
           geometry={boxGeometryTHREE}
           position={[0, 0, 0]}
@@ -82,13 +84,15 @@ export function BlockSpinner({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
       {/* floor */}
-      <mesh
-        geometry={boxGeometryTHREE}
-        position={[0, -0.1, 0]}
-        scale={[4, 0.2, 4]}
-        material={floor2Material}
-        receiveShadow
-      />
+      <RigidBody type="kinematicPosition">
+        <mesh
+          geometry={boxGeometryTHREE}
+          position={[0, -0.1, 0]}
+          scale={[4, 0.2, 4]}
+          material={floor2Material}
+          receiveShadow
+        />
+      </RigidBody>
       {/* rigidbody allows for kinematic movement and other physics attributes for child mesh */}
       <RigidBody
         type="kinematicPosition"
@@ -139,13 +143,15 @@ export function BlockLimbo({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
       {/* floor */}
-      <mesh
-        geometry={boxGeometryTHREE}
-        position={[0, -0.1, 0]}
-        scale={[4, 0.2, 4]}
-        material={floor2Material}
-        receiveShadow
-      />
+      <RigidBody type="kinematicPosition">
+        <mesh
+          geometry={boxGeometryTHREE}
+          position={[0, -0.1, 0]}
+          scale={[4, 0.2, 4]}
+          material={floor2Material}
+          receiveShadow
+        />
+      </RigidBody>
       {/* rigidbody allows for kinematic movement and other physics attributes for child mesh */}
       <RigidBody
         type="kinematicPosition"
@@ -154,7 +160,6 @@ export function BlockLimbo({ position = [0, 0, 0] }) {
         friction={0}
         ref={obstacleRef}
       >
-        {/*  */}
         <mesh
           geometry={boxGeometryTHREE}
           material={obstacleMaterial}
@@ -196,13 +201,15 @@ export function BlockAxe({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
       {/* floor */}
-      <mesh
-        geometry={boxGeometryTHREE}
-        position={[0, -0.1, 0]}
-        scale={[4, 0.2, 4]}
-        material={floor2Material}
-        receiveShadow
-      />
+      <RigidBody type="kinematicPosition">
+        <mesh
+          geometry={boxGeometryTHREE}
+          position={[0, -0.1, 0]}
+          scale={[4, 0.2, 4]}
+          material={floor2Material}
+          receiveShadow
+        />
+      </RigidBody>
       {/* rigidbody allows for kinematic movement and other physics attributes for child mesh */}
       <RigidBody
         type="kinematicPosition"
@@ -227,7 +234,7 @@ export function BlockAxe({ position = [0, 0, 0] }) {
 function Bounds({ length = 1 }) {
   return (
     <>
-      <RigidBody type="fixed" restitution={5} friction={0}>
+      <RigidBody type="fixed" restitution={0.2} friction={0}>
         <mesh
           scale={[0.3, 1.5, 4 * length]}
           position={[2.15, 0.75, -(length * 2) + 2]}
