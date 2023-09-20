@@ -1,26 +1,34 @@
 import { RigidBody, useRapier } from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
 import { useKeyboardControls } from "@react-three/drei";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
 
 export default function Marble() {
   const bodyRef = useRef(null);
   const [subscribeKeys, getKeys] = useKeyboardControls();
   const { rapier, world } = useRapier();
 
+  const [smoothedCameraPosition] = useState(
+    // arguments set initial camera position
+    () => new THREE.Vector3(10, 10, 10)
+  );
+  const [smoothedCameraTarget] = useState(() => new THREE.Vector3());
+
   const jump = () => {
-    // if(bodyRef.current)
-    console.log("body ref", bodyRef.current);
-    const origin = body.current.translation();
+    const origin = bodyRef.current.translation();
     origin.y -= 0.31;
     const direction = { x: 0, y: -1, z: 0 };
     const ray = new rapier.Ray(origin, direction);
-    const hit = rapierWorld.castRay(ray);
-    bodyRef.current.applyImpulse({ x: 0, y: 0.5, z: 0 });
+    const hit = world.castRay(ray, 10, true);
+
+    if (hit.toi < 0.15) {
+      bodyRef.current.applyImpulse({ x: 0, y: 0.5, z: 0 });
+    }
   };
 
   useEffect(() => {
-    subscribeKeys(
+    const unsubscribeJump = subscribeKeys(
       (state) => {
         return state.jump;
       },
@@ -30,6 +38,10 @@ export default function Marble() {
         }
       }
     );
+    // runs this function when component is destroyed
+    return () => {
+      unsubscribeJump();
+    };
   }, []);
 
   useFrame((state, delta) => {
@@ -41,6 +53,7 @@ export default function Marble() {
     const impulseStrength = 0.6 * delta;
     const torqueStrength = 1 * delta;
 
+    // controls
     if (forward) {
       impulse.z -= impulseStrength;
       torque.x -= torqueStrength;
@@ -62,6 +75,25 @@ export default function Marble() {
     bodyRef.current.applyImpulse(impulse);
     // rotates player (marble) body
     bodyRef.current.applyTorqueImpulse(torque);
+
+    // camera
+    const bodyPosition = bodyRef.current.translation();
+    const cameraPosition = new THREE.Vector3();
+    cameraPosition.copy(bodyPosition);
+    cameraPosition.z += 2.25;
+    cameraPosition.y += 0.65;
+
+    // makes camera follow marble
+    const cameraTarget = new THREE.Vector3();
+    // set target to player bodyPosition
+    cameraTarget.copy(bodyPosition);
+    cameraTarget.y += 0.25;
+    // method for use on initial value, increments value closer to destination (argument)
+    smoothedCameraPosition.lerp(cameraPosition, 5 * delta);
+    smoothedCameraTarget.lerp(cameraTarget, 5 * delta);
+
+    state.camera.position.copy(cameraPosition);
+    state.camera.lookAt(cameraTarget);
   }, []);
 
   return (
